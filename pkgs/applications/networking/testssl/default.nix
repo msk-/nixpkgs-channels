@@ -1,7 +1,7 @@
 { stdenv, fetchFromGitHub, pkgs }:
 
 let
-  version = "2.9.5-1";
+  version = "2.9.5-4";
   pwdBinPath = "${stdenv.lib.makeBinPath (with pkgs; [ coreutils ])}/pwd";
   opensslBinPath = "${stdenv.lib.makeBinPath (with pkgs; [ openssl ])}/openssl";
 
@@ -12,20 +12,16 @@ in stdenv.mkDerivation rec {
     owner = "drwetter";
     repo = "testssl.sh";
     rev = "v${version}";
-    sha256 = "0hz6g685jwl0c0jrdca746425xpwiwc8lnlc2gigga5hkcq8qzl9";
+    sha256 = "0pfp7r4jhvkh06vawqlvq7vp4imwp6dpq6jx8m0k3j85ywwp45pd";
   };
-
-  nativeBuildInputs = with pkgs; [
-    makeWrapper
-  ];
 
   patches = [ ./testssl.patch ];
 
   postPatch = ''
-    sed -i -e "s|/bin/pwd|${pwdBinPath}|g"                                     \
-           -e "s|TESTSSL_INSTALL_DIR:-\"\"|TESTSSL_INSTALL_DIR:-\"$out\"|g"    \
-           -e "s|OPENSSL:-\"\"|OPENSSL:-\"${opensslBinPath}\"|g" \
-           testssl.sh
+    substituteInPlace testssl.sh                                               \
+      --replace /bin/pwd                    ${pwdBinPath}                      \
+      --replace TESTSSL_INSTALL_DIR:-\"\"   TESTSSL_INSTALL_DIR:-\"$out\"      \
+      --replace @@openssl-path@@            ${opensslBinPath}
   '';
 
   installPhase = ''
