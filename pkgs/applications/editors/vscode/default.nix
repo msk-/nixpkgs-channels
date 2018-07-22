@@ -1,8 +1,8 @@
 { stdenv, lib, callPackage, fetchurl, unzip, atomEnv, makeDesktopItem,
-  makeWrapper, libXScrnSaver, libxkbfile, libsecret }:
+  gtk2, makeWrapper, libXScrnSaver, libxkbfile, libsecret }:
 
 let
-  version = "1.22.1";
+  version = "1.25.0";
   channel = "stable";
 
   plat = {
@@ -12,15 +12,16 @@ let
   }.${stdenv.system};
 
   sha256 = {
-    "i686-linux" = "1w1ywf21vcwmfq5ngag1y076nxbdqg3qav90ilxgd3dkv5j6fkjr";
-    "x86_64-linux" = "14phpsrkkv09dgr7phqhgjzfhm3zzbh3w2yhyng0cj3vwzysikcs";
-    "x86_64-darwin" = "0fqsr4ramanl7v1damf01zkmg75s9nlfkj6298h9sjvhc93pfcll";
+    "i686-linux" = "1dgn9swqax54pn5ykk97zdkkzyj46jambmnkb67cn44p29bw9s9m";
+    "x86_64-linux" = "0w2lzif7iilibvwhvg13gxarwz41qsb72s8hvj87mk5iqfdms1px";
+    "x86_64-darwin" = "08xhwvggflzh9lfc5s3jgrqb49yz4jdfii8sfq6v8w3c6yy8cdly";
   }.${stdenv.system};
 
   archive_fmt = if stdenv.system == "x86_64-darwin" then "zip" else "tar.gz";
 
   rpath = lib.concatStringsSep ":" [
     atomEnv.libPath
+    "${lib.makeLibraryPath [gtk2]}"
     "${lib.makeLibraryPath [libsecret]}/libsecret-1.so.0"
     "${lib.makeLibraryPath [libXScrnSaver]}/libXss.so.1"
     "${lib.makeLibraryPath [libxkbfile]}/libxkbfile.so.1"

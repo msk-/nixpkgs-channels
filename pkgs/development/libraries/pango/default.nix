@@ -1,5 +1,5 @@
 { stdenv, fetchurl, fetchpatch, pkgconfig, libXft, cairo, harfbuzz
-, libintlOrEmpty, gobjectIntrospection, darwin
+, libintl, gobjectIntrospection, darwin
 }:
 
 with stdenv.lib;
@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
        CoreGraphics
        CoreText
     ]);
-  propagatedBuildInputs = [ cairo harfbuzz libXft ] ++ libintlOrEmpty;
+  propagatedBuildInputs = [ cairo harfbuzz libXft libintl ];
 
   enableParallelBuilding = true;
 
@@ -49,7 +49,7 @@ stdenv.mkDerivation rec {
       Pango forms the core of text and font handling for GTK+-2.x.
     '';
 
-    homepage = http://www.pango.org/;
+    homepage = https://www.pango.org/;
     license = licenses.lgpl2Plus;
 
     maintainers = with maintainers; [ raskin ];

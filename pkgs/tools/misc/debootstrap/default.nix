@@ -4,13 +4,13 @@
 # There is also cdebootstrap now. Is that easier to maintain?
 stdenv.mkDerivation rec {
   name = "debootstrap-${version}";
-  version = "1.0.95";
+  version = "1.0.105";
 
   src = fetchurl {
     # git clone git://git.debian.org/d-i/debootstrap.git
     # I'd like to use the source. However it's lacking the lanny script ? (still true?)
     url = "mirror://debian/pool/main/d/debootstrap/debootstrap_${version}.tar.gz";
-    sha256 = "1xpd1yblcgwhri64hzgxhalpf5j8gqbmkrsm1fs0pbwiy0wdz0ry";
+    sha256 = "0m4630q8smn45pmck1azk5sv6cgdzza2r001paqvmasqa6qxbjq3";
   };
 
   buildInputs = [ dpkg gettext gawk perl ];

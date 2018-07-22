@@ -41,8 +41,8 @@ self: super: {
     prePatch = "sed -i -e 's/process.*< 1.5,/process,/g' Cabal.cabal";
   });
 
-  # jailbreak-cabal doesn't seem to work right with the native Cabal version.
-  jailbreak-cabal = pkgs.haskell.packages.ghc802.jailbreak-cabal;
+  # Build with the latest Cabal version, which works best albeit not perfectly.
+  jailbreak-cabal = super.jailbreak-cabal.override { Cabal = self.Cabal_2_2_0_1; };
 
   # https://github.com/bmillwood/applicative-quoters/issues/6
   applicative-quoters = appendPatch super.applicative-quoters (pkgs.fetchpatch {
@@ -84,13 +84,26 @@ self: super: {
   purescript = doJailbreak (super.purescript);
 
   # These packages need Cabal 2.2.x, which is not the default.
-  distribution-nixpkgs = super.distribution-nixpkgs.overrideScope (self: super: { Cabal = self.Cabal_2_2_0_1; });
-  hackage-db_2_0_1 = super.hackage-db_2_0_1.overrideScope (self: super: { Cabal = self.Cabal_2_2_0_1; });
   cabal2nix = super.cabal2nix.overrideScope (self: super: { Cabal = self.Cabal_2_2_0_1; });
   cabal2spec = super.cabal2spec.overrideScope (self: super: { Cabal = self.Cabal_2_2_0_1; });
+  distribution-nixpkgs = super.distribution-nixpkgs.overrideScope (self: super: { Cabal = self.Cabal_2_2_0_1; });
+  hackage-db_2_0_1 = super.hackage-db_2_0_1.overrideScope (self: super: { Cabal = self.Cabal_2_2_0_1; });
+  stack = super.stack.overrideScope (self: super: { Cabal = self.Cabal_2_2_0_1; });
   stylish-cabal = dontCheck (super.stylish-cabal.overrideScope (self: super: {
     Cabal = self.Cabal_2_2_0_1;
     haddock-library = dontHaddock (dontCheck self.haddock-library_1_5_0_1);
   }));
+
+  # Hledger depends indirectly on different versions of base-compat. The
+  # override can probably be removed once we update to LTS 12.x.
+  hledger-lib = super.hledger-lib.overrideScope (self: super: { base-compat = self.base-compat_0_10_4; });
+  hledger = super.hledger.overrideScope (self: super: {
+    base-compat = self.base-compat_0_10_4;
+    aeson = self.aeson_1_4_0_0;
+  });
+  hledger-web = super.hledger-web.overrideScope (self: super: {
+    base-compat = self.base-compat_0_10_4;
+    aeson = self.aeson_1_4_0_0;
+  });
 
 }

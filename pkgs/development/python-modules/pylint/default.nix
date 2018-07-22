@@ -2,13 +2,12 @@
   pytest, pytestrunner,  mccabe, configparser, backports_functools_lru_cache }:
 
 buildPythonPackage rec {
-  name = "${pname}-${version}";
   pname = "pylint";
-  version = "1.8.2";
+  version = "1.9.2";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "4fe3b99da7e789545327b75548cee6b511e4faa98afe268130fea1af4b5ec022";
+    sha256 = "fff220bcb996b4f7e2b0f6812fd81507b72ca4d8c4d05daf2655c333800cb9b3";
   };
 
   buildInputs = [ pytest pytestrunner mccabe configparser backports_functools_lru_cache ];
@@ -33,7 +32,7 @@ buildPythonPackage rec {
   '';
 
   meta = with stdenv.lib; {
-    homepage = http://www.logilab.org/project/pylint;
+    homepage = https://www.logilab.org/project/pylint;
     description = "A bug and style checker for Python";
     platforms = platforms.all;
     license = licenses.gpl1Plus;

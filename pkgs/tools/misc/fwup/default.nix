@@ -4,13 +4,13 @@
 
 stdenv.mkDerivation rec {
   name = "fwup-${version}";
-  version = "1.0.0";
+  version = "1.2.1";
 
   src = fetchFromGitHub {
     owner = "fhunleth";
     repo = "fwup";
     rev = "v${version}";
-    sha256 = "1v79q5s4lm8scrz9nmqcszyh40is6k7hkr15r4aljyfbp1gamsfs";
+    sha256 = "14a3bd84bnnxdrf1x80w860mhm3x4cy9jp9sf9643svq4bky4i41";
   };
 
   doCheck = true;
@@ -22,9 +22,6 @@ stdenv.mkDerivation rec {
       darwin.apple_sdk.frameworks.DiskArbitration
     ];
   propagatedBuildInputs = [ zip unzip mtools dosfstools coreutils ];
-
-  # segfaults on darwin without
-  NIX_LDFLAGS = lib.optional stdenv.isDarwin "-F/System/Library/Frameworks";
 
   meta = with stdenv.lib; {
     description = "Configurable embedded Linux firmware update creator and runner";

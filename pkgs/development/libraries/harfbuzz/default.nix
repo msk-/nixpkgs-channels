@@ -1,11 +1,11 @@
-{ stdenv, fetchurl, pkgconfig, glib, freetype, cairo, libintlOrEmpty
+{ stdenv, fetchurl, pkgconfig, glib, freetype, cairo, libintl
 , icu, graphite2, harfbuzz # The icu variant uses and propagates the non-icu one.
 , withIcu ? false # recommended by upstream as default, but most don't needed and it's big
 , withGraphite2 ? true # it is small and major distros do include it
 }:
 
 let
-  version = "1.7.5";
+  version = "1.8.1";
   inherit (stdenv.lib) optional optionals optionalString;
 in
 
@@ -13,8 +13,8 @@ stdenv.mkDerivation {
   name = "harfbuzz${optionalString withIcu "-icu"}-${version}";
 
   src = fetchurl {
-    url = "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${version}.tar.bz2";
-    sha256 = "84574e1b1f65ca694cb8fb6905309665c0368af18a312357f8ff886ee2f29563";
+    url = "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${version}.tar.bz2";
+    sha256 = "0ifzhqbg4p6ka7ps5c7lapix09i9yy4z7achc1gf91dhvn967vgv";
   };
 
   outputs = [ "out" "dev" ];
@@ -25,9 +25,8 @@ stdenv.mkDerivation {
     ( "--with-icu=" +       (if withIcu       then "yes" else "no") )
   ];
 
-  nativeBuildInputs = [ pkgconfig ];
-  buildInputs = [ glib freetype cairo ] # recommended by upstream
-    ++ libintlOrEmpty;
+  nativeBuildInputs = [ pkgconfig libintl ];
+  buildInputs = [ glib freetype cairo ]; # recommended by upstream
   propagatedBuildInputs = []
     ++ optional withGraphite2 graphite2
     ++ optionals withIcu [ icu harfbuzz ]

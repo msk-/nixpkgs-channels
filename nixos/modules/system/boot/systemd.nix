@@ -137,7 +137,6 @@ let
 
       # Slices / containers.
       "slices.target"
-      "system.slice"
       "user.slice"
       "machine.slice"
       "machines.target"
@@ -516,7 +515,7 @@ in
     };
 
     systemd.globalEnvironment = mkOption {
-      type = types.attrs;
+      type = with types; attrsOf (nullOr (either str package));
       default = {};
       example = { TZ = "CET"; };
       description = ''
@@ -799,13 +798,13 @@ in
         mkdir -m 0700 -p /var/log/journal
       '';
 
-    users.extraUsers.systemd-network.uid = config.ids.uids.systemd-network;
-    users.extraGroups.systemd-network.gid = config.ids.gids.systemd-network;
-    users.extraUsers.systemd-resolve.uid = config.ids.uids.systemd-resolve;
-    users.extraGroups.systemd-resolve.gid = config.ids.gids.systemd-resolve;
+    users.users.systemd-network.uid = config.ids.uids.systemd-network;
+    users.groups.systemd-network.gid = config.ids.gids.systemd-network;
+    users.users.systemd-resolve.uid = config.ids.uids.systemd-resolve;
+    users.groups.systemd-resolve.gid = config.ids.gids.systemd-resolve;
 
     # Target for ‘charon send-keys’ to hook into.
-    users.extraGroups.keys.gid = config.ids.gids.keys;
+    users.groups.keys.gid = config.ids.gids.keys;
 
     systemd.targets.keys =
       { description = "Security Keys";
@@ -836,13 +835,14 @@ in
 
     system.requiredKernelConfig = map config.lib.kernelConfig.isEnabled
       [ "DEVTMPFS" "CGROUPS" "INOTIFY_USER" "SIGNALFD" "TIMERFD" "EPOLL" "NET"
-        "SYSFS" "PROC_FS" "FHANDLE" "DMIID" "AUTOFS4_FS" "TMPFS_POSIX_ACL"
+        "SYSFS" "PROC_FS" "FHANDLE" "CRYPTO_USER_API_HASH" "CRYPTO_HMAC"
+        "CRYPTO_SHA256" "DMIID" "AUTOFS4_FS" "TMPFS_POSIX_ACL"
         "TMPFS_XATTR" "SECCOMP"
       ];
 
-    users.extraGroups.systemd-journal.gid = config.ids.gids.systemd-journal;
-    users.extraUsers.systemd-journal-gateway.uid = config.ids.uids.systemd-journal-gateway;
-    users.extraGroups.systemd-journal-gateway.gid = config.ids.gids.systemd-journal-gateway;
+    users.groups.systemd-journal.gid = config.ids.gids.systemd-journal;
+    users.users.systemd-journal-gateway.uid = config.ids.uids.systemd-journal-gateway;
+    users.groups.systemd-journal-gateway.gid = config.ids.gids.systemd-journal-gateway;
 
     # Generate timer units for all services that have a ‘startAt’ value.
     systemd.timers =

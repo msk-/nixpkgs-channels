@@ -113,8 +113,8 @@ in
     # It's useful to have transmission in path, e.g. for remote control
     environment.systemPackages = [ pkgs.transmission ];
 
-    users.extraGroups.transmission.gid = config.ids.gids.transmission;
-    users.extraUsers.transmission = {
+    users.groups.transmission.gid = config.ids.gids.transmission;
+    users.users.transmission = {
       group = "transmission";
       uid = config.ids.uids.transmission;
       description = "Transmission BitTorrent user";
@@ -147,6 +147,7 @@ in
           ${getLib pkgs.libcap}/lib/libcap*.so*            mr,
           ${getLib pkgs.attr}/lib/libattr*.so*             mr,
           ${getLib pkgs.lz4}/lib/liblz4*.so*               mr,
+          ${getLib pkgs.libkrb5}/lib/lib*.so*              mr,
 
           @{PROC}/sys/kernel/random/uuid   r,
           @{PROC}/sys/vm/overcommit_memory r,

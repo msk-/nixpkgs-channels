@@ -296,7 +296,6 @@ let
     protolite = [ pkgs.protobuf ];
     qtbase = [ pkgs.qt4 ];
     qtpaint = [ pkgs.qt4 ];
-    R2GUESS = [ pkgs.gsl_1 ];
     R2SWF = [ pkgs.zlib pkgs.libpng pkgs.freetype.dev ];
     RAppArmor = [ pkgs.libapparmor ];
     rapportools = [ pkgs.which ];
@@ -314,6 +313,7 @@ let
     Rglpk = [ pkgs.glpk ];
     RGtk2 = [ pkgs.gtk2.dev ];
     rhdf5 = [ pkgs.zlib ];
+    Rhdf5lib = [ pkgs.zlib ];
     Rhpc = [ pkgs.zlib pkgs.bzip2.dev pkgs.icu pkgs.lzma.dev pkgs.openmpi pkgs.pcre.dev ];
     Rhtslib = [ pkgs.zlib.dev pkgs.automake pkgs.autoconf ];
     RJaCGH = [ pkgs.zlib.dev ];
@@ -392,11 +392,12 @@ let
     nat = [ pkgs.which ];
     nat_nblast = [ pkgs.which ];
     nat_templatebrains = [ pkgs.which ];
-    pbdZMQ = lib.optionals stdenv.isDarwin [ pkgs.binutils.bintools ];
+    pbdZMQ = lib.optionals stdenv.isDarwin [ pkgs.darwin.binutils ];
     RMark = [ pkgs.which ];
     RPushbullet = [ pkgs.which ];
     qtpaint = [ pkgs.cmake ];
     qtbase = [ pkgs.cmake pkgs.perl ];
+    RcppEigen = [ pkgs.libiconv ];
     RCurl = [ pkgs.curl.dev ];
     R2SWF = [ pkgs.pkgconfig ];
     rggobi = [ pkgs.pkgconfig ];
@@ -409,7 +410,7 @@ let
     fftw = [ pkgs.pkgconfig ];
     geoCount = [ pkgs.pkgconfig ];
     gdtools = [ pkgs.pkgconfig ];
-    JuniperKernel = lib.optionals stdenv.isDarwin [ pkgs.binutils.bintools ];
+    JuniperKernel = lib.optionals stdenv.isDarwin [ pkgs.darwin.binutils ];
     kza = [ pkgs.pkgconfig ];
     magick = [ pkgs.pkgconfig ];
     mwaved = [ pkgs.pkgconfig ];
@@ -433,12 +434,17 @@ let
     PET = [ pkgs.which pkgs.xorg.xdpyinfo pkgs.imagemagick ];
     dti = [ pkgs.which pkgs.xorg.xdpyinfo pkgs.imagemagick ];
     mzR = [ pkgs.netcdf ];
+    cluster = [ pkgs.libiconv ];
+    KernSmooth = [ pkgs.libiconv ];
+    nlme = [ pkgs.libiconv ];
+    Matrix = [ pkgs.libiconv ];
+    mgcv = [ pkgs.libiconv ];
+    igraph = [ pkgs.libiconv ];
   };
 
   packagesRequireingX = [
     "accrual"
     "ade4TkGUI"
-    "adehabitat"
     "analogue"
     "analogueExtra"
     "AnalyzeFMRI"
@@ -472,7 +478,6 @@ let
     "cpa"
     "DALY"
     "dave"
-    "debug"
     "Deducer"
     "DeducerExtras"
     "DeducerPlugInExample"
@@ -491,7 +496,6 @@ let
     "EasyqpcR"
     "EcoVirtual"
     "ENiRG"
-    "eVenn"
     "exactLoglinTest"
     "fat2Lpoly"
     "fbati"
@@ -585,13 +589,11 @@ let
     "ProbForecastGOP"
     "qtbase"
     "qtpaint"
-    "R2STATS"
     "r4ss"
     "RandomFields"
     "rareNMtests"
     "rAverage"
     "Rcmdr"
-    "RcmdrPlugin_BCA"
     "RcmdrPlugin_coin"
     "RcmdrPlugin_depthTools"
     "RcmdrPlugin_DoE"
@@ -625,7 +627,6 @@ let
     "RcmdrPlugin_temis"
     "RcmdrPlugin_UCA"
     "recluster"
-    "relax"
     "relimp"
     "RenextGUI"
     "reportRx"
@@ -744,6 +745,10 @@ let
       patches = [ ./patches/BayesXsrc.patch ];
     });
 
+    Rhdf5lib = old.Rhdf5lib.overrideDerivation (attrs: {
+      patches = [ ./patches/Rhdf5lib.patch ];
+    });
+
     rJava = old.rJava.overrideDerivation (attrs: {
       preConfigure = ''
         export JAVA_CPPFLAGS=-I${pkgs.jdk}/include/
@@ -759,9 +764,9 @@ let
     });
 
     JuniperKernel = old.JuniperKernel.overrideDerivation (attrs: {
-      postPatch = ''
+      postPatch = lib.optionalString stdenv.isDarwin ''
         for file in {R,src}/*.R; do
-            sed -i 's#system("which \(otool\|install_name_tool\)"[^)]*)#"${pkgs.binutils.bintools}/bin/\1"#g' $file
+            sed -i 's#system("which \(otool\|install_name_tool\)"[^)]*)#"${pkgs.darwin.cctools}/bin/\1"#g' $file
         done
       '';
       preConfigure = ''
@@ -769,14 +774,10 @@ let
       '';
     });
 
-    Mposterior = old.Mposterior.overrideDerivation (attrs: {
-      PKG_LIBS = "-L${pkgs.openblasCompat}/lib -lopenblas";
-    });
-
     pbdZMQ = old.pbdZMQ.overrideDerivation (attrs: {
       postPatch = lib.optionalString stdenv.isDarwin ''
         for file in R/*.{r,r.in}; do
-            sed -i 's#system("which \(\w\+\)"[^)]*)#"${pkgs.binutils.bintools}/bin/\1"#g' $file
+            sed -i 's#system("which \(\w\+\)"[^)]*)#"${pkgs.darwin.cctools}/bin/\1"#g' $file
         done
       '';
     });

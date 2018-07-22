@@ -1,8 +1,9 @@
 { stdenv, buildPythonPackage, fetchPypi, isPy26, argparse, attrs, hypothesis, py
-, setuptools_scm, setuptools, six, pluggy, funcsigs, isPy3k
+, setuptools_scm, setuptools, six, pluggy, funcsigs, isPy3k, more-itertools
+, atomicwrites, mock
 }:
 buildPythonPackage rec {
-  version = "3.4.1";
+  version = "3.6.2";
   pname = "pytest";
 
   preCheck = ''
@@ -12,14 +13,20 @@ buildPythonPackage rec {
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "9ddcb879c8cc859d2540204b5399011f842e5e8823674bf429f70ada281b3cc6";
+    sha256 = "8ea01fc4fcc8e1b1e305252b4bc80a1528019ab99fd3b88666c9dc38d754406c";
   };
 
-  checkInputs = [ hypothesis ];
+  checkInputs = [ hypothesis mock ];
   buildInputs = [ setuptools_scm ];
-  propagatedBuildInputs = [ attrs py setuptools six pluggy ]
+  propagatedBuildInputs = [ attrs py setuptools six pluggy more-itertools atomicwrites]
     ++ (stdenv.lib.optional (!isPy3k) funcsigs)
     ++ (stdenv.lib.optional isPy26 argparse);
+
+  checkPhase = ''
+    runHook preCheck
+    $out/bin/py.test -x testing/
+    runHook postCheck
+  '';
 
   meta = with stdenv.lib; {
     maintainers = with maintainers; [ domenkozar lovek323 madjar lsix ];

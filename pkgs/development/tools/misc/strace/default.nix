@@ -2,22 +2,22 @@
 
 stdenv.mkDerivation rec {
   name = "strace-${version}";
-  version = "4.21";
+  version = "4.23";
 
   src = fetchurl {
     url = "https://strace.io/files/${version}/${name}.tar.xz";
-    sha256 = "0dsw6xcfrmygidp1dj2ch8cl8icrar7789snkb2r8gh78kdqhxjw";
+    sha256 = "1bcsq2gbpcb81ayryvn56a6kjx42fc21la6qgds35n0xbybacq3q";
   };
 
   depsBuildBuild = [ buildPackages.stdenv.cc ];
   nativeBuildInputs = [ perl ];
 
-  buildInputs = stdenv.lib.optional libunwind.supportsHost [ libunwind ]; # support -k
+  buildInputs = stdenv.lib.optional libunwind.supportsHost libunwind; # support -k
 
   configureFlags = stdenv.lib.optional (stdenv.hostPlatform.isAarch64 || stdenv.hostPlatform.isRiscV) "--enable-mpers=check";
 
   meta = with stdenv.lib; {
-    homepage = http://strace.io/;
+    homepage = https://strace.io/;
     description = "A system call tracer for Linux";
     license = licenses.bsd3;
     platforms = platforms.linux;

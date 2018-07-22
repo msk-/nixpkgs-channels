@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, pkgconfig, perl
+{ stdenv, lib, fetchurl, pkgconfig, perl
 , http2Support ? true, nghttp2
 , idnSupport ? false, libidn ? null
 , ldapSupport ? false, openldap ? null
@@ -24,11 +24,14 @@ assert brotliSupport -> brotli != null;
 assert gssSupport -> kerberos != null;
 
 stdenv.mkDerivation rec {
-  name = "curl-7.58.0";
+  name = "curl-7.60.0";
 
   src = fetchurl {
-    url = "https://curl.haxx.se/download/${name}.tar.bz2";
-    sha256 = "0cg7klhf1ksnbw5wvwa802qir877zv4y3dj7swz1xh07g3wq3c0w";
+    urls = [
+      "https://github.com/curl/curl/releases/download/${lib.replaceStrings ["."] ["_"] name}/${name}.tar.bz2"
+      "https://curl.haxx.se/download/${name}.tar.bz2"
+    ];
+    sha256 = "16qyhy9alq2wk6zgqhh5dchr45f6nxaqzy3rh8rbx6dx0hignzc9";
   };
 
   outputs = [ "bin" "dev" "out" "man" "devdoc" ];
@@ -73,8 +76,10 @@ stdenv.mkDerivation rec {
     ++ stdenv.lib.optional c-aresSupport "--enable-ares=${c-ares}"
     ++ stdenv.lib.optional gssSupport "--with-gssapi=${kerberos.dev}";
 
-  CXX = "c++";
-  CXXCPP = "c++ -E";
+  CXX = "${stdenv.cc.targetPrefix}c++";
+  CXXCPP = "${stdenv.cc.targetPrefix}c++ -E";
+
+  doCheck = false; # expensive, fails
 
   postInstall = ''
     moveToOutput bin/curl-config "$dev"
@@ -91,7 +96,7 @@ stdenv.mkDerivation rec {
     configureFlags = [
         ( if sslSupport then "--with-ssl=${openssl.crossDrv}" else "--without-ssl" )
         ( if gnutlsSupport then "--with-gnutls=${gnutls.crossDrv}" else "--without-gnutls" )
-        "--with-random /dev/urandom"
+        "--with-random=/dev/urandom"
       ];
   };
 

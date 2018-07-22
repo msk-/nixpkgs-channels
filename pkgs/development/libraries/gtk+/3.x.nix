@@ -1,7 +1,7 @@
 { stdenv, fetchurl, fetchpatch, pkgconfig, gettext, perl, makeWrapper, shared-mime-info
 , expat, glib, cairo, pango, gdk_pixbuf, atk, at-spi2-atk, gobjectIntrospection
 , xorg, epoxy, json-glib, libxkbcommon, gmp
-, waylandSupport ? stdenv.isLinux, wayland, wayland-protocols
+, waylandSupport ? stdenv.isLinux, mesa_noglu, wayland, wayland-protocols
 , xineramaSupport ? stdenv.isLinux
 , cupsSupport ? stdenv.isLinux, cups ? null
 , darwin, gnome3
@@ -12,14 +12,14 @@ assert cupsSupport -> cups != null;
 with stdenv.lib;
 
 let
-  version = "3.22.29";
+  version = "3.22.30";
 in
 stdenv.mkDerivation rec {
   name = "gtk+3-${version}";
 
   src = fetchurl {
     url = "mirror://gnome/sources/gtk+/${gnome3.versionBranch version}/gtk+-${version}.tar.xz";
-    sha256 = "1y5vzdbgww9l7xcrg13azff2rs94kggkywmpcsh39h7w76wn8zd0";
+    sha256 = "0rv5k8fyi2i19k4zncai6vf429s6zy3kncr8vb6f3m034z0sb951";
   };
 
   outputs = [ "out" "dev" ];
@@ -40,13 +40,11 @@ stdenv.mkDerivation rec {
   propagatedBuildInputs = with xorg; with stdenv.lib;
     [ expat glib cairo pango gdk_pixbuf atk at-spi2-atk gnome3.gsettings-desktop-schemas
       libXrandr libXrender libXcomposite libXi libXcursor libSM libICE ]
-    ++ optionals waylandSupport [ wayland wayland-protocols ]
+    ++ optionals waylandSupport [ mesa_noglu wayland wayland-protocols ]
     ++ optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [ AppKit Cocoa ])
     ++ optional xineramaSupport libXinerama
     ++ optional cupsSupport cups;
   #TODO: colord?
-
-  NIX_LDFLAGS = optionalString stdenv.isDarwin "-lintl";
 
   # demos fail to install, no idea where's the problem
   preConfigure = "sed '/^SRC_SUBDIRS /s/demos//' -i Makefile.in";
@@ -64,6 +62,8 @@ stdenv.mkDerivation rec {
   ] ++ optional waylandSupport [
     "--enable-wayland-backend"
   ];
+
+  doCheck = false; # needs X11
 
   postInstall = optionalString (!stdenv.isDarwin) ''
     substituteInPlace "$out/lib/gtk-3.0/3.0.0/printbackends/libprintbackend-cups.la" \

@@ -7,10 +7,15 @@ let
     };
     inherit (gnome2) GConf gnome_vfs;
   };
+  stableVersion = {
+    version = "3.1.3.0"; # "Android Studio 3.1.3"
+    build = "173.4819257";
+    sha256Hash = "196yaswbxh2nd83gimjxr8ggr5xkdxq7n3xlh6ax73v59pj4hryq";
+  };
   latestVersion = {
-    version = "3.2.0.9"; # "Android Studio 3.2 Canary 10"
-    build = "181.4705630";
-    sha256Hash = "07xf00f0wvrk576iaqn7qpcpgar432n6q3jlgpslhm4m1cww3sww";
+    version = "3.3.0.1"; # "Android Studio 3.3 Canary 2"
+    build = "181.4869471";
+    sha256Hash = "1v2v09gd5vxh4nzbnrjfh0blpzz71i3i7lq5bkjsfl0g82r8j512";
   };
 in rec {
   # Old alias
@@ -18,12 +23,9 @@ in rec {
 
   # Attributes are named by the corresponding release channels
 
-  stable = mkStudio {
+  stable = mkStudio (stableVersion // {
     pname = "android-studio";
     #pname = "android-studio-stable"; # TODO: Rename and provide symlink
-    version = "3.1.0.16"; # "Android Studio 3.1"
-    build = "173.4670197";
-    sha256Hash = "1i0ldyadrcyy5pl9vjpm2k755mf08xi9x5qz8655qsbiajzqf9fy";
 
     meta = with stdenv.lib; {
       description = "The Official IDE for Android (stable channel)";
@@ -36,20 +38,20 @@ in rec {
       platforms = [ "x86_64-linux" ];
       maintainers = with maintainers; [ primeos ];
     };
-  };
+  });
 
-  beta = mkStudio {
+  beta = mkStudio (latestVersion // {
     pname = "android-studio-preview";
     #pname = "android-studio-beta"; # TODO: Rename and provide symlink
-    version = "3.1.0.16"; # "Android Studio 3.1"
-    build = "173.4670197";
-    sha256Hash = "1i0ldyadrcyy5pl9vjpm2k755mf08xi9x5qz8655qsbiajzqf9fy";
+    version = "3.2.0.19"; # "Android Studio 3.2 Beta 2"
+    build = "181.4860949";
+    sha256Hash = "1v1h42xp2fxj8366q9l9b0shk0y1vz9kny0rf7y48kyr5h9glnwr";
 
     meta = stable.meta // {
       description = "The Official IDE for Android (beta channel)";
       homepage = https://developer.android.com/studio/preview/index.html;
     };
-  };
+  });
 
   dev = mkStudio (latestVersion // {
     pname = "android-studio-dev";

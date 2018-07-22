@@ -193,6 +193,7 @@ let
 
   snakeOilCa = pkgs.runCommand "snakeoil-ca" {
     buildInputs = [ pkgs.openssl ];
+    allowSubstitutes = false;
   } ''
     mkdir "$out"
     openssl req -newkey rsa:4096 -x509 -sha256 -days 36500 \
@@ -215,6 +216,7 @@ let
     '';
   in pkgs.runCommand "snakeoil-certs-${fqdn}" {
     buildInputs = [ pkgs.openssl ];
+    allowSubstitutes = false;
   } ''
     mkdir "$out"
     openssl genrsa -out "$out/snakeoil.key" 4096
@@ -386,6 +388,10 @@ in {
 
     services.nginx.enable = true;
     services.nginx.recommendedProxySettings = true;
+    # This fixes the test on i686
+    services.nginx.commonHttpConfig = ''
+      server_names_hash_bucket_size 64;
+    '';
     services.nginx.virtualHosts.${wfeDomain} = {
       onlySSL = true;
       enableACME = false;

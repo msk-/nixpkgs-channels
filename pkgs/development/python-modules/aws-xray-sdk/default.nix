@@ -4,19 +4,20 @@
 , jsonpickle
 , wrapt
 , requests
+, future
 }:
 
 buildPythonPackage rec {
   pname = "aws-xray-sdk";
-  version = "0.95";
+  version = "1.1.1";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "9e7ba8dd08fd2939376c21423376206bff01d0deaea7d7721c6b35921fed1943";
+    sha256 = "13470b95a2f55036a5d7b6642250d8f3a519a6c454cd91f55778b1bb4bf5b89d";
   };
 
   propagatedBuildInputs = [
-    jsonpickle wrapt requests
+    jsonpickle wrapt requests future
   ];
 
   meta = {
